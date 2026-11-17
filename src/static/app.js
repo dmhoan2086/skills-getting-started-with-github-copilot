@@ -74,7 +74,26 @@ document.addEventListener("DOMContentLoaded", () => {
                 messageDiv.textContent = result.message;
                 messageDiv.className = "success";
                 messageDiv.classList.remove("hidden");
+                const shouldRestoreFocus =
+                  document.activeElement === document.body ||
+                  document.activeElement === removeButton;
+                const participantIndex = details.participants.indexOf(email);
                 await fetchActivities();
+                if (shouldRestoreFocus && document.activeElement === document.body) {
+                  const refreshedCard = Array.from(
+                    activitiesList.querySelectorAll(".activity-card")
+                  ).find((card) => card.querySelector("h4").textContent === name);
+                  if (refreshedCard) {
+                    const remainingButtons = refreshedCard.querySelectorAll(".participant-remove");
+                    const focusTarget =
+                      remainingButtons[Math.min(participantIndex, remainingButtons.length - 1)] ||
+                      refreshedCard.querySelector("h4");
+                    if (remainingButtons.length === 0) {
+                      focusTarget.tabIndex = -1;
+                    }
+                    focusTarget.focus();
+                  }
+                }
               } catch (error) {
                 messageDiv.textContent = error.message || "Failed to unregister. Please try again.";
                 messageDiv.className = "error";
